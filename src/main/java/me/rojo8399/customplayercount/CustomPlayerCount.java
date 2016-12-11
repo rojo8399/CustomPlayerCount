@@ -3,7 +3,6 @@ package me.rojo8399.customplayercount;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -11,11 +10,9 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
@@ -36,10 +33,11 @@ public class CustomPlayerCount {
 	public static final String PLUGIN_VERSION = "1.0";
 
 	private static CustomPlayerCount instance;
-	private static PluginContainer plugin;
 
 	@Inject
 	private Logger logger;
+	
+	@Inject PluginContainer plugin;
 
 	@Inject
 	@ConfigDir(sharedRoot = false)
@@ -65,10 +63,7 @@ public class CustomPlayerCount {
 	@Listener
 	public void onGameInitializationEvent(GameInitializationEvent event) {
 		Sponge.getEventManager().registerListeners(this, new Ping());
-	}
-
-	@Listener
-	public void onGameStartingServerEvent(GameStartingServerEvent event) {
+		
 		CommandSpec cpcCommandSpec = CommandSpec.builder().description(Text.of("CustomPlayerCount Version Viewer"))
 				.executor(new cpcCommand()).build();
 
@@ -78,12 +73,7 @@ public class CustomPlayerCount {
 	@Listener
 	public void onReload(GameReloadEvent event) {
 		Config.getConfig().load();
-		Cause cause = event.getCause();
-		Optional<Player> player = cause.first(Player.class);
-		if (player.isPresent()) {
-			player.get().sendMessage(
-					Text.builder().color(TextColors.GREEN).append(Text.of("Reloading CustomPlayerCount...")).build());
-		}
+		event.getCause().first(Player.class).ifPresent(p -> p.sendMessage(Text.builder().color(TextColors.GREEN).append(Text.of("Reloading CustomPlayerCount...")).build()));
 		getLogger().info("Reloading CustomPlayerCount...");
 	}
 

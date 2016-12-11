@@ -46,6 +46,25 @@ public class Config implements Configurable {
 	public void load() {
 		try {
 			configNode = configLoader.load();
+			
+			/* 
+			 * Config Updates
+			 */
+			switch (get().getNode("ConfigVersion").getInt()) {
+			case 1: {
+				get().getNode("ConfigVersion").setValue(2);
+				get().getNode("PlayerCount")
+						.setComment("Can be a math expression such as 5 + {online} * 2"
+								+ "\nUse {online} for actual player count."
+								+ "\nUse {randInt} for a random number. Set its min and max below.");
+				get().getNode("RandomMin").setValue(0).setComment("The minimum the random number will be.");
+				get().getNode("RandomMax").setValue(10).setComment("The maximum the random number will be.");
+			}
+			case 2: {
+				// Alls Good :)
+			}
+			}
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -62,8 +81,12 @@ public class Config implements Configurable {
 
 	@Override
 	public void populate() {
-		get().getNode("PlayerCount").setValue("{online} + 5").setComment(
-				"Can be a math expression such as 5 + {online} * 2" + "\nUse {online} for actual player count.");
+		get().getNode("ConfigVersion").setValue(2);
+		get().getNode("PlayerCount").setValue("{online} + 5 * {randInt}").setComment(
+				"Can be a math expression such as 5 + {online} * 2" + "\nUse {online} for actual player count."
+						+ "\nUse {randInt} for a random number. Set its min and max below.");
+		get().getNode("RandomMin").setValue(0).setComment("The minimum the random number will be.");
+		get().getNode("RandomMax").setValue(10).setComment("The maximum the random number will be.");
 	}
 
 	@Override

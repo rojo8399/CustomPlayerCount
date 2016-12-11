@@ -95,14 +95,21 @@ public class Ping {
 		}
 		return 0;
 	}
+	
+	public static String randInt(int min, int max) {
+		Integer randNum = (min + (int)(Math.random() * ((max - min) + 1)));
+		return randNum.toString();
+	}
 
 	@Listener
 	public void onPing(ClientPingServerEvent event) throws ScriptException {
 
 		Integer current = event.getResponse().getPlayers().get().getOnline();
+		Integer randMin = Config.getConfig().get().getNode("RandomMin").getInt();
+		Integer randMax = Config.getConfig().get().getNode("RandomMax").getInt();
 
 		String config = Config.getConfig().get().getNode("PlayerCount").getString();
-		String finalConfig = config.replace("{online}", current.toString());
+		String finalConfig = config.replace("{online}", current.toString()).replace("{randInt}", randInt(randMin, randMax));
 
 		event.getResponse().getPlayers().get().setOnline(Ping.evaluate(finalConfig));
 	}
